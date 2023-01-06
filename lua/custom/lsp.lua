@@ -1,4 +1,6 @@
 -- LSP settings.
+
+vim.diagnostic.config({ virtual_text = false })
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
     -- NOTE: Remember that lua is a real programming language, and as such it is possible
@@ -52,7 +54,13 @@ require('mason').setup()
 
 -- Enable the following language servers
 -- Feel free to add/remove any LSPs that you want here. They will automatically be installed
-local servers = { 'clangd', 'pyright', 'sumneko_lua', 'gopls' }
+local servers = {
+    'clangd',
+    'pyright',
+    'sumneko_lua',
+    'gopls',
+    --'bash-language-server'
+}
 
 -- Ensure the servers above are installed
 require('mason-lspconfig').setup {
@@ -109,6 +117,10 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 
 cmp.setup {
+    completion = {
+        -- autocomplete = false,
+        keyword_length = 3,
+    },
     snippet = {
         expand = function(args)
             luasnip.lsp_expand(args.body)
@@ -146,3 +158,12 @@ cmp.setup {
         { name = 'luasnip' },
     },
 }
+
+-- null-ls setup
+local null_ls = require("null-ls")
+
+null_ls.setup({
+    sources = {
+        null_ls.builtins.formatting.stylua,
+    },
+})
