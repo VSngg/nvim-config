@@ -25,6 +25,8 @@ require("packer").startup(function(use)
 		requires = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip", "saadparwaiz1/cmp_luasnip" },
 	})
 
+	use("rafamadriz/friendly-snippets")
+
 	use({ -- Highlight, edit, and navigate code
 		"nvim-treesitter/nvim-treesitter",
 		run = function()
@@ -217,8 +219,7 @@ vim.keymap.set("n", "<leader>fd", require("telescope.builtin").diagnostics, { de
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open diagnostics in a floating window" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Add diagnostics to the location list" })
+vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics in a floating window" })
 
 -- Cybu --
 vim.keymap.set("n", "H", "<Plug>(CybuPrev)")

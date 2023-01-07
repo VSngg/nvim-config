@@ -159,6 +159,7 @@ cmp.setup {
     },
 }
 
+require("luasnip.loaders.from_vscode").lazy_load()
 -- null-ls setup
 local null_ls = require("null-ls")
 
