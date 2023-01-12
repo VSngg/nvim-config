@@ -94,6 +94,11 @@ _G.packer_plugins = {
     path = "/home/vs/.local/share/nvim/site/pack/packer/start/adwaita.nvim",
     url = "https://github.com/Mofiqul/adwaita.nvim"
   },
+  ["align.nvim"] = {
+    loaded = true,
+    path = "/home/vs/.local/share/nvim/site/pack/packer/start/align.nvim",
+    url = "https://github.com/Vonr/align.nvim"
+  },
   ["cmp-nvim-lsp"] = {
     loaded = true,
     path = "/home/vs/.local/share/nvim/site/pack/packer/start/cmp-nvim-lsp",

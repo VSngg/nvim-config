@@ -7,7 +7,7 @@ local util = require "zenbones.util"
 
 local bg = vim.o.background
 local palette = util.palette_extend({
-		bg = hsluv "#1e1e1e",
+		bg = hsluv "#171717",
 		fg = hsluv "#deddda",
 		rose = hsluv "#ED333B",
 		leaf = hsluv "#57E389",
@@ -22,7 +22,8 @@ local base_specs = generator.generate(palette, bg, generator.get_global_config(c
 
 local specs = lush.extends({ base_specs }).with(function()
 	return {
-		ColorColumn { bg = palette.bg.lighten(5).hex }
+		ColorColumn { bg = hsluv("#1c1c1c")},
+		CursorLine { bg = hsluv("#1c1c1c")}
 	}
 end)
 

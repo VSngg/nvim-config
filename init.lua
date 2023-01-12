@@ -60,6 +60,7 @@ require("packer").startup(function(use)
 	use({ "stefanvanburen/rams", requires = "rktjmp/lush.nvim" })
 	use("norcalli/nvim-colorizer.lua")
 	use("kylechui/nvim-surround")
+	use("Vonr/align.nvim")
 
 	-- Fuzzy Finder (files, lsp, etc)
 	use({ "nvim-telescope/telescope.nvim", branch = "0.1.x", requires = { "nvim-lua/plenary.nvim" } })
@@ -96,7 +97,7 @@ set.showmode = false
 set.showmatch = true -- Show matching brackets
 set.matchtime = 3 -- Set matching brackets time
 set.cmdheight = 1
-set.cmdwinheight = 1
+set.cmdwinheight = 10
 
 set.autowrite = true -- Automatically save when editing multiple files
 set.hidden = true -- Hide buffers when they are abandoned
@@ -163,6 +164,7 @@ vim.cmd([[colorscheme adwaitabones]])
 
 -- Set completeopt to have a better completion experience
 set.completeopt = "menuone,noselect"
+set.inccommand = "split"
 
 -------------------------
 -- ----- REQUIRE ----- --
@@ -239,6 +241,22 @@ vim.keymap.set("n", "<down>", "<C-x>", { desc = "Decrement" })
 
 -- Formatting --
 vim.keymap.set("n", "<leader>F", vim.lsp.buf.format)
+
+-- Align --
+local NS = { noremap = true, silent = true }
+
+vim.keymap.set('x', '<leader>Aa',
+	function() require'align'.align_to_char(1, true)
+	end, NS , { desc = "Aligns to 1 character, looking left" })
+vim.keymap.set('x', '<leader>As',
+	function() require'align'.align_to_char(2, true, true)
+	end, NS , { desc = "Aligns to 2 characters, looking left and with previews"})
+vim.keymap.set('x', '<leader>Aw',
+	function() require'align'.align_to_string(false, true, true)
+	end, NS) -- Aligns to a string, looking left and with previews
+vim.keymap.set('x', '<leader>Ar',
+	function() require'align'.align_to_string(true, true, true)
+	end, NS) -- Aligns to a Lua pattern, looking left and with previews
 
 ------------------------------
 -- ----- AUTOCOMMANDS ----- --
