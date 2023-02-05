@@ -47,7 +47,6 @@ require("packer").startup(function(use)
 	use("lewis6991/gitsigns.nvim")
 
 	use("numToStr/Navigator.nvim")
-	use("Mofiqul/adwaita.nvim")
 	use("windwp/nvim-autopairs")
 	use("nvim-lualine/lualine.nvim") -- Fancier statusline
 	use("lukas-reineke/indent-blankline.nvim") -- Add indentation guides even on blank lines
@@ -56,11 +55,10 @@ require("packer").startup(function(use)
 	use("ghillb/cybu.nvim")
 	use("kyazdani42/nvim-web-devicons")
 	use("kvrohit/rasmus.nvim")
-	use({ "mcchrish/zenbones.nvim", requires = "rktjmp/lush.nvim" })
-	use({ "stefanvanburen/rams", requires = "rktjmp/lush.nvim" })
 	use("norcalli/nvim-colorizer.lua")
 	use("kylechui/nvim-surround")
 	use("Vonr/align.nvim")
+	use("bluz71/vim-moonfly-colors")
 
 	-- Fuzzy Finder (files, lsp, etc)
 	use({ "nvim-telescope/telescope.nvim", branch = "0.1.x", requires = { "nvim-lua/plenary.nvim" } })
@@ -160,7 +158,7 @@ set.cindent = true
 -- Set colorscheme
 set.termguicolors = true
 set.background = "dark"
-vim.cmd([[colorscheme adwaitabones]])
+vim.cmd([[colorscheme moonfly]])
 
 -- Set completeopt to have a better completion experience
 set.completeopt = "menuone,noselect"
@@ -212,10 +210,10 @@ vim.keymap.set("n", "<leader>/", function()
 	}))
 end, { desc = "[/] Fuzzily search in current buffer]" })
 
-vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files, { desc = "[F]ind [F]iles" })
-vim.keymap.set("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "[F]ind [H]elp" })
+vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files,  { desc = "[F]ind [F]iles" })
+vim.keymap.set("n", "<leader>fh", require("telescope.builtin").help_tags,   { desc = "[F]ind [H]elp" })
 vim.keymap.set("n", "<leader>fw", require("telescope.builtin").grep_string, { desc = "[F]ind current [W]ord" })
-vim.keymap.set("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "[F]ind by [G]rep" })
+vim.keymap.set("n", "<leader>fg", require("telescope.builtin").live_grep,   { desc = "[F]ind by [G]rep" })
 vim.keymap.set("n", "<leader>fd", require("telescope.builtin").diagnostics, { desc = "[F]ind [D]iagnostics" })
 
 -- Diagnostic keymaps
@@ -236,8 +234,8 @@ vim.keymap.set("n", "<C-j>", "<CMD>NavigatorDown<CR>")
 -- Increment/Decrement --
 vim.keymap.set("n", "<leader>a", "<C-a>", { desc = "Increment" })
 vim.keymap.set("n", "<leader>x", "<C-x>", { desc = "Decrement" })
-vim.keymap.set("n", "<up>", "<C-a>", { desc = "Increment" })
-vim.keymap.set("n", "<down>", "<C-x>", { desc = "Decrement" })
+vim.keymap.set("n", "<up>", "<C-a>",      { desc = "Increment" })
+vim.keymap.set("n", "<down>", "<C-x>",    { desc = "Decrement" })
 
 -- Formatting --
 vim.keymap.set("n", "<leader>F", vim.lsp.buf.format)
