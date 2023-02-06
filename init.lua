@@ -256,6 +256,11 @@ vim.keymap.set('x', '<leader>Ar',
 	function() require'align'.align_to_string(true, true, true)
 	end, NS) -- Aligns to a Lua pattern, looking left and with previews
 
+-- insert en_US symbols from russian keyboard --
+vim.keymap.set("n", "<leader>2", "i@<esc>")
+vim.keymap.set("n", "<leader>3", "i#<esc>")
+vim.keymap.set("n", "<leader>4", "i$<esc>")
+vim.keymap.set("n", "<leader>7", "i&<esc>")
 ------------------------------
 -- ----- AUTOCOMMANDS ----- --
 ------------------------------
