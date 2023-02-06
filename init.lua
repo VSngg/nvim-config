@@ -193,7 +193,10 @@ require("gitsigns").setup()
 -------------------------
 
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
+
 vim.keymap.set("n", "<leader>l", ":nohl<CR>", { silent = true })
+vim.keymap.set("n", "<leader>w", ":wq<CR>", { silent = true })
+vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true })
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
