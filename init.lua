@@ -58,6 +58,7 @@ require("packer").startup(function(use)
 	use("norcalli/nvim-colorizer.lua")
 	use("kylechui/nvim-surround")
 	use("Vonr/align.nvim")
+	use("echasnovski/mini.align")
 	use("bluz71/vim-moonfly-colors")
 
 	-- Fuzzy Finder (files, lsp, etc)
@@ -187,6 +188,7 @@ require("nvim-surround").setup({})
 -- }
 
 require("gitsigns").setup()
+require('mini.align').setup()
 
 -------------------------
 -- ----- KEYMAPS ----- --
@@ -201,6 +203,9 @@ vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true })
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+vim.keymap.set({"n","x","o"}, "H", "g^")
+vim.keymap.set({"n","x","o"}, "L", "g$")
 
 -- Telescope keybinds
 vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
@@ -225,8 +230,8 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics in a floating window" })
 
 -- Cybu --
-vim.keymap.set("n", "H", "<Plug>(CybuPrev)")
-vim.keymap.set("n", "L", "<Plug>(CybuNext)")
+vim.keymap.set("n", "<leader>p", "<Plug>(CybuPrev)")
+vim.keymap.set("n", "<leader>n", "<Plug>(CybuNext)")
 
 -- Navigator(tmux) --
 vim.keymap.set("n", "<C-h>", "<CMD>NavigatorLeft<CR>")
@@ -242,22 +247,6 @@ vim.keymap.set("n", "<down>", "<C-x>",    { desc = "Decrement" })
 
 -- Formatting --
 vim.keymap.set("n", "<leader>F", vim.lsp.buf.format)
-
--- Align --
-local NS = { noremap = true, silent = true }
-
-vim.keymap.set('x', '<leader>Aa',
-	function() require'align'.align_to_char(1, true)
-	end, NS , { desc = "Aligns to 1 character, looking left" })
-vim.keymap.set('x', '<leader>As',
-	function() require'align'.align_to_char(2, true, true)
-	end, NS , { desc = "Aligns to 2 characters, looking left and with previews"})
-vim.keymap.set('x', '<leader>Aw',
-	function() require'align'.align_to_string(false, true, true)
-	end, NS) -- Aligns to a string, looking left and with previews
-vim.keymap.set('x', '<leader>Ar',
-	function() require'align'.align_to_string(true, true, true)
-	end, NS) -- Aligns to a Lua pattern, looking left and with previews
 
 -- insert en_US symbols from russian keyboard --
 vim.keymap.set("n", "<leader>2", "i@<esc>")
