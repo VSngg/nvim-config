@@ -1,89 +1,88 @@
--- Install packer
-local install_path = vim.fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-local is_bootstrap = false
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-	is_bootstrap = true
-	vim.fn.execute("!git clone https://github.com/wbthomason/packer.nvim " .. install_path)
-	vim.cmd([[packadd packer.nvim]])
+-- Install lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazypath,
+	})
 end
+vim.opt.rtp:prepend(lazypath)
 
-require("packer").startup(function(use)
-	-- Package manager
-	use("wbthomason/packer.nvim")
-
-	use({ -- LSP Configuration & Plugins
+local plugins = {
+	{ -- LSP Configuration & Plugins
 		"neovim/nvim-lspconfig",
-		requires = {
+		dependencies = {
 			"williamboman/mason.nvim",
 			"williamboman/mason-lspconfig.nvim",
 			"j-hui/fidget.nvim",
 		},
-	})
+	},
 
-	use({ -- Autocompletion
-		"hrsh7th/nvim-cmp",
-		requires = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip", "saadparwaiz1/cmp_luasnip" },
-	})
+	{ -- Autocompletion
+	"hrsh7th/nvim-cmp",
+		dependencies = {
+			"hrsh7th/cmp-nvim-lsp",
+			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip"
+		},
+	},
 
-	use("rafamadriz/friendly-snippets")
+	"rafamadriz/friendly-snippets",
 
-	use({ -- Highlight, edit, and navigate code
-		"nvim-treesitter/nvim-treesitter",
-		run = function()
+	{ -- Highlight, edit, and navigate code
+	"nvim-treesitter/nvim-treesitter",
+		build = function()
 			pcall(require("nvim-treesitter.install").update({ with_sync = true }))
 		end,
-	})
+	},
 
-	use({ -- Additional text objects via treesitter
-		"nvim-treesitter/nvim-treesitter-textobjects",
-		after = "nvim-treesitter",
-	})
-
-	use("jose-elias-alvarez/null-ls.nvim")
+	"nvim-treesitter/nvim-treesitter-textobjects",
+	"jose-elias-alvarez/null-ls.nvim",
 
 	-- Git related plugins
-	use("tpope/vim-fugitive")
-	use("tpope/vim-rhubarb")
-	use("lewis6991/gitsigns.nvim")
+	"tpope/vim-fugitive",
+	"tpope/vim-rhubarb",
+	"lewis6991/gitsigns.nvim",
 
-	use("numToStr/Navigator.nvim")
-	use("windwp/nvim-autopairs")
-	use("nvim-lualine/lualine.nvim") -- Fancier statusline
-	use("lukas-reineke/indent-blankline.nvim") -- Add indentation guides even on blank lines
-	use("numToStr/Comment.nvim") -- "gc" to comment visual regions/lines
-	use("tpope/vim-sleuth") -- Detect tabstop and shiftwidth automatically
-	use("ghillb/cybu.nvim")
-	use("kyazdani42/nvim-web-devicons")
-	use("kvrohit/rasmus.nvim")
-	use("norcalli/nvim-colorizer.lua")
-	use("kylechui/nvim-surround")
-	use("Vonr/align.nvim")
-	use("echasnovski/mini.align")
-	use("bluz71/vim-moonfly-colors")
+	"numToStr/Navigator.nvim",
+	"windwp/nvim-autopairs",
+	"nvim-lualine/lualine.nvim", -- Fancier statusline
+	"lukas-reineke/indent-blankline.nvim", -- Add indentation guides even on blank lines
+	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
+	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+	"ghillb/cybu.nvim",
+	"kyazdani42/nvim-web-devicons",
+	"kvrohit/rasmus.nvim",
+	"norcalli/nvim-colorizer.lua",
+	"kylechui/nvim-surround",
+	"echasnovski/mini.align",
+	"bluz71/vim-moonfly-colors",
 
 	-- Fuzzy Finder (files, lsp, etc)
-	use({ "nvim-telescope/telescope.nvim", branch = "0.1.x", requires = { "nvim-lua/plenary.nvim" } })
+	{ "nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
+		dependencies = { "nvim-lua/plenary.nvim" }
+	},
 
 	-- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
-	use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make", cond = vim.fn.executable("make") == 1 })
+	{ "nvim-telescope/telescope-fzf-native.nvim",
+		build = "make",
+		cond = vim.fn.executable("make") == 1
+	},
 
-	use({
+	{
 		"folke/which-key.nvim",
 		config = function()
 			require("which-key").setup({})
 		end,
-	})
+	},
+}
 
-	-- Add custom plugins to packer from /nvim/lua/custom/plugins.lua
-	local has_plugins, plugins = pcall(require, "custom.plugins")
-	if has_plugins then
-		plugins(use)
-	end
-
-	if is_bootstrap then
-		require("packer").sync()
-	end
-end)
+require("lazy").setup(plugins)
 
 -------------------------
 -- ----- OPTIONS ----- --
@@ -271,3 +270,4 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 vim.cmd("autocmd BufEnter * set formatoptions-=cro")
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 vim.cmd("autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0")
+vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
