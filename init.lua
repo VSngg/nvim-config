@@ -23,7 +23,7 @@ local plugins = {
 	},
 
 	{ -- Autocompletion
-	"hrsh7th/nvim-cmp",
+		"hrsh7th/nvim-cmp",
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
 			"L3MON4D3/LuaSnip",
@@ -34,7 +34,7 @@ local plugins = {
 	"rafamadriz/friendly-snippets",
 
 	{ -- Highlight, edit, and navigate code
-	"nvim-treesitter/nvim-treesitter",
+		"nvim-treesitter/nvim-treesitter",
 		build = function()
 			pcall(require("nvim-treesitter.install").update({ with_sync = true }))
 		end,
@@ -69,10 +69,10 @@ local plugins = {
 	},
 
 	-- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
-	{ "nvim-telescope/telescope-fzf-native.nvim",
-		build = "make",
-		cond = vim.fn.executable("make") == 1
-	},
+	-- { "nvim-telescope/telescope-fzf-native.nvim",
+	-- 	build = "make",
+	-- 	cond = vim.fn.executable("make") == 1
+	-- },
 
 	{
 		"folke/which-key.nvim",
@@ -89,6 +89,8 @@ require("lazy").setup(plugins)
 -------------------------
 
 local set = vim.opt
+
+vim.cmd([[language en_US]])
 
 set.showcmd = false -- Show (partial) command in status line
 set.showmode = false
@@ -119,7 +121,7 @@ set.clipboard = "unnamedplus"
 
 -- set.spelllang = ru_ru,en_us
 set.langmap = "ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,"
-	.. "фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
+.. "фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
 
 -- ----- Enable folding ----- --
 
@@ -205,6 +207,9 @@ vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 
 vim.keymap.set({"n","x","o"}, "H", "g^")
 vim.keymap.set({"n","x","o"}, "L", "g$")
+
+-- Put semicolon at the end of the line
+vim.keymap.set("i", "<A-;>", "<Esc>miA;<Esc>`ii")
 
 -- Telescope keybinds
 vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
