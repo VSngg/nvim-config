@@ -2,7 +2,11 @@
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'help' },
+<<<<<<< HEAD
+    ensure_installed = {},
+=======
+    ensure_installed = {},
+>>>>>>> cb5660f (small changes)
 
     highlight = { enable = true },
     indent = { enable = false },
