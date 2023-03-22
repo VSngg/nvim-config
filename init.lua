@@ -291,7 +291,4 @@ vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 vim.cmd("autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0")
 vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType c set expandtab ts=4 shiftwidth=4 softtabstop=4")
-<<<<<<< Updated upstream
-=======
 vim.cmd("autocmd FileType h set expandtab ts=4 shiftwidth=4 softtabstop=4")
->>>>>>> Stashed changes
