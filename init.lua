@@ -80,6 +80,17 @@ local plugins = {
 			require("which-key").setup({})
 		end,
 	},
+	{
+	  "nvim-neo-tree/neo-tree.nvim",
+	  version = "*",
+	  dependencies = {
+		"nvim-lua/plenary.nvim",
+		"MunifTanjim/nui.nvim",
+	  },
+	  config = function ()
+		require('neo-tree').setup {}
+	  end,
+	},
 }
 
 require("lazy").setup(plugins)
@@ -106,7 +117,7 @@ set.pumheight = 10 -- Pop-up menu height
 
 set.scrolloff = 5
 set.number = true -- Show line numbers
-set.relativenumber = true -- Show line numbers
+set.relativenumber = false -- Show line numbers
 set.signcolumn = "yes"
 set.cursorline = true -- Highlight cursorline
 -- set.cursorcolumn = true       -- Highlight cursorcolumn
@@ -217,7 +228,7 @@ vim.keymap.set("n", "<leader>b", require("telescope.builtin").buffers, { desc = 
 vim.keymap.set("n", "<leader>/", function()
 	-- You can pass additional configuration to telescope to change theme, layout, etc.
 	require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-		winblend = 10,
+		winblend = 20,
 		previewer = false,
 	}))
 end, { desc = "[/] Fuzzily search in current buffer]" })
@@ -234,8 +245,8 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics in a floating window" })
 
 -- Cybu --
-vim.keymap.set("n", "<leader>p", "<Plug>(CybuPrev)")
-vim.keymap.set("n", "<leader>n", "<Plug>(CybuNext)")
+vim.keymap.set("n", "gp", "<Plug>(CybuPrev)")
+vim.keymap.set("n", "gn", "<Plug>(CybuNext)")
 
 -- Navigator(tmux) --
 vim.keymap.set("n", "<C-h>", "<CMD>NavigatorLeft<CR>")
@@ -251,6 +262,9 @@ vim.keymap.set("n", "<down>", "<C-x>",    { desc = "Decrement" })
 
 -- Formatting --
 vim.keymap.set("n", "<leader>F", vim.lsp.buf.format)
+
+-- NeoTree --
+vim.keymap.set("n", "<leader>e", "<CMD>NeoTreeRevealToggle<CR>")
 
 -- insert en_US symbols from russian keyboard --
 vim.keymap.set("n", "<leader>2", "i@<esc>")
@@ -277,3 +291,7 @@ vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 vim.cmd("autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0")
 vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType c set expandtab ts=4 shiftwidth=4 softtabstop=4")
+<<<<<<< Updated upstream
+=======
+vim.cmd("autocmd FileType h set expandtab ts=4 shiftwidth=4 softtabstop=4")
+>>>>>>> Stashed changes
