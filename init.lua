@@ -90,7 +90,7 @@ require("lazy").setup(plugins)
 
 local set = vim.opt
 
-vim.cmd([[language en_US]])
+--vim.cmd([[language en_US]])
 
 set.showcmd = false -- Show (partial) command in status line
 set.showmode = false
