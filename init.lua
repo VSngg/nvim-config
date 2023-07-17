@@ -53,7 +53,7 @@ local plugins = {
 	"nvim-lualine/lualine.nvim", -- Fancier statusline
 	"lukas-reineke/indent-blankline.nvim", -- Add indentation guides even on blank lines
 	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
-	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+	-- "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	"ghillb/cybu.nvim",
 	"kyazdani42/nvim-web-devicons",
 	"kvrohit/rasmus.nvim",
@@ -61,6 +61,8 @@ local plugins = {
 	"kylechui/nvim-surround",
 	"echasnovski/mini.align",
 	"bluz71/vim-moonfly-colors",
+	"Tetralux/odin.vim",
+    "haringsrob/nvim_context_vt",
 
 	-- Fuzzy Finder (files, lsp, etc)
 	{ "nvim-telescope/telescope.nvim",
@@ -73,6 +75,9 @@ local plugins = {
 	-- 	build = "make",
 	-- 	cond = vim.fn.executable("make") == 1
 	-- },
+
+	-- nvim-qt integration
+	"equalsraf/neovim-gui-shim",
 
 	{
 		"folke/which-key.nvim",
@@ -96,7 +101,7 @@ set.showcmd = false -- Show (partial) command in status line
 set.showmode = false
 set.showmatch = true -- Show matching brackets
 set.matchtime = 3 -- Set matching brackets time
-set.cmdheight = 1
+set.cmdheight = 0
 set.cmdwinheight = 10
 
 set.autowrite = true -- Automatically save when editing multiple files
@@ -121,7 +126,7 @@ set.clipboard = "unnamedplus"
 
 -- set.spelllang = ru_ru,en_us
 set.langmap = "ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,"
-.. "фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
+	.. "фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
 
 -- ----- Enable folding ----- --
 
@@ -191,6 +196,10 @@ require("nvim-surround").setup({})
 require("gitsigns").setup()
 require('mini.align').setup()
 
+require("nvim_context_vt").setup({
+    min_rows = 5,
+})
+
 -------------------------
 -- ----- KEYMAPS ----- --
 -------------------------
@@ -200,13 +209,15 @@ vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 vim.keymap.set("n", "<leader>l", ":nohl<CR>", { silent = true })
 vim.keymap.set("n", "<leader>w", ":wq<CR>", { silent = true })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true })
+vim.keymap.set("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
+vim.keymap.set("n", "<leader>ee", ":25Lex<CR>", { silent = true })
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
-vim.keymap.set({"n","x","o"}, "H", "g^")
-vim.keymap.set({"n","x","o"}, "L", "g$")
+vim.keymap.set({ "n", "x", "o" }, "H", "g^")
+vim.keymap.set({ "n", "x", "o" }, "L", "g$")
 
 -- Put semicolon at the end of the line
 vim.keymap.set("i", "<A-;>", "<Esc>miA;<Esc>`ii")
@@ -222,10 +233,10 @@ vim.keymap.set("n", "<leader>/", function()
 	}))
 end, { desc = "[/] Fuzzily search in current buffer]" })
 
-vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files,  { desc = "[F]ind [F]iles" })
-vim.keymap.set("n", "<leader>fh", require("telescope.builtin").help_tags,   { desc = "[F]ind [H]elp" })
+vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files, { desc = "[F]ind [F]iles" })
+vim.keymap.set("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "[F]ind [H]elp" })
 vim.keymap.set("n", "<leader>fw", require("telescope.builtin").grep_string, { desc = "[F]ind current [W]ord" })
-vim.keymap.set("n", "<leader>fg", require("telescope.builtin").live_grep,   { desc = "[F]ind by [G]rep" })
+vim.keymap.set("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "[F]ind by [G]rep" })
 vim.keymap.set("n", "<leader>fd", require("telescope.builtin").diagnostics, { desc = "[F]ind [D]iagnostics" })
 
 -- Diagnostic keymaps
@@ -234,8 +245,8 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics in a floating window" })
 
 -- Cybu --
-vim.keymap.set("n", "<leader>p", "<Plug>(CybuPrev)")
-vim.keymap.set("n", "<leader>n", "<Plug>(CybuNext)")
+vim.keymap.set("n", "gp", "<Plug>(CybuPrev)")
+vim.keymap.set("n", "gn", "<Plug>(CybuNext)")
 
 -- Navigator(tmux) --
 vim.keymap.set("n", "<C-h>", "<CMD>NavigatorLeft<CR>")
@@ -246,11 +257,11 @@ vim.keymap.set("n", "<C-j>", "<CMD>NavigatorDown<CR>")
 -- Increment/Decrement --
 vim.keymap.set("n", "<leader>a", "<C-a>", { desc = "Increment" })
 vim.keymap.set("n", "<leader>x", "<C-x>", { desc = "Decrement" })
-vim.keymap.set("n", "<up>", "<C-a>",      { desc = "Increment" })
-vim.keymap.set("n", "<down>", "<C-x>",    { desc = "Decrement" })
+vim.keymap.set("n", "<up>", "<C-a>", { desc = "Increment" })
+vim.keymap.set("n", "<down>", "<C-x>", { desc = "Decrement" })
 
 -- Formatting --
-vim.keymap.set("n", "<leader>F", vim.lsp.buf.format)
+vim.keymap.set("n", "<leader>F", vim.lsp.buf.format, { desc = "Format buffer"})
 
 -- insert en_US symbols from russian keyboard --
 vim.keymap.set("n", "<leader>2", "i@<esc>")
@@ -276,3 +287,11 @@ vim.cmd("autocmd BufEnter * set formatoptions-=cro")
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 vim.cmd("autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0")
 vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
+vim.cmd("autocmd FileType c,h set expandtab ts=4 shiftwidth=4 softtabstop=4")
+vim.cmd("autocmd FileType odin set expandtab ts=4 shiftwidth=4 softtabstop=4")
+vim.cmd("autocmd FileType go set expandtab ts=4 shiftwidth=4 softtabstop=4")
+
+if vim.g.neovide then
+    -- Put anything you want to happen only in Neovide here
+    vim.o.guifont = "Iosevka:h16"
+end

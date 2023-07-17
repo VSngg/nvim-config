@@ -55,10 +55,10 @@ require('mason').setup()
 -- Enable the following language servers
 -- Feel free to add/remove any LSPs that you want here. They will automatically be installed
 local servers = {
-    -- 'clangd',
+    'clangd',
     -- 'pyright',
     -- 'sumneko_lua',
-    -- 'gopls',
+    'gopls',
     --'bash-language-server'
 }
 
