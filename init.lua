@@ -13,25 +13,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
-	{ -- LSP Configuration & Plugins
-		"neovim/nvim-lspconfig",
-		dependencies = {
-			"williamboman/mason.nvim",
-			"williamboman/mason-lspconfig.nvim",
-			"j-hui/fidget.nvim",
-		},
-	},
-
-	{ -- Autocompletion
-		"hrsh7th/nvim-cmp",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip"
-		},
-	},
-
-	"rafamadriz/friendly-snippets",
+    "lifepillar/vim-mucomplete",
 
 	{ -- Highlight, edit, and navigate code
 		"nvim-treesitter/nvim-treesitter",
@@ -54,16 +36,14 @@ local plugins = {
 	"lukas-reineke/indent-blankline.nvim", -- Add indentation guides even on blank lines
 	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
 	-- "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
-	"ghillb/cybu.nvim",
+	--"ghillb/cybu.nvim",
 	"kyazdani42/nvim-web-devicons",
-	"kvrohit/rasmus.nvim",
 	"norcalli/nvim-colorizer.lua",
 	"kylechui/nvim-surround",
 	"echasnovski/mini.align",
 	"bluz71/vim-moonfly-colors",
 	"Tetralux/odin.vim",
     "haringsrob/nvim_context_vt",
-
 	-- Fuzzy Finder (files, lsp, etc)
 	{ "nvim-telescope/telescope.nvim",
 		branch = "0.1.x",
@@ -77,7 +57,7 @@ local plugins = {
 	-- },
 
 	-- nvim-qt integration
-	"equalsraf/neovim-gui-shim",
+	-- "equalsraf/neovim-gui-shim",
 
 	{
 		"folke/which-key.nvim",
@@ -179,9 +159,9 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 require("custom.treesitter")
-require("custom.lsp")
+-- require("custom.lsp")
 require("custom.lualine")
-require("custom.cybu")
+--require("custom.cybu")
 
 require("Comment").setup()
 require("Navigator").setup()
@@ -207,10 +187,13 @@ require("nvim_context_vt").setup({
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
 vim.keymap.set("n", "<leader>l", ":nohl<CR>", { silent = true })
-vim.keymap.set("n", "<leader>w", ":wq<CR>", { silent = true })
-vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true })
 vim.keymap.set("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
 vim.keymap.set("n", "<leader>ee", ":25Lex<CR>", { silent = true })
+vim.keymap.set("n", "<leader>g", "<C-]>", { silent = true, desc = "Go to definition (CTags)" })
+vim.keymap.set("n", "<leader>G", ":vert botright wincmd ]<CR>", { silent = true, desc = "Go to definition (CTags)" })
+vim.keymap.set("n", "<leader>G", ":vert botright wincmd ]<CR>", { silent = true, desc = "Go to definition (CTags)" })
+vim.keymap.set("n", "<leader>i", "<C-I>", { silent = true, desc = "Jump forward" })
+vim.keymap.set("n", "<leader>o", "<C-O>", { silent = true, desc = "Jump back" })
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -231,7 +214,7 @@ vim.keymap.set("n", "<leader>/", function()
 		winblend = 10,
 		previewer = false,
 	}))
-end, { desc = "[/] Fuzzily search in current buffer]" })
+end, { desc = "[/] Fuzzily search in buffer]" })
 
 vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files, { desc = "[F]ind [F]iles" })
 vim.keymap.set("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "[F]ind [H]elp" })
@@ -242,17 +225,25 @@ vim.keymap.set("n", "<leader>fd", require("telescope.builtin").diagnostics, { de
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
-vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics in a floating window" })
+vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics" })
 
 -- Cybu --
-vim.keymap.set("n", "gp", "<Plug>(CybuPrev)")
-vim.keymap.set("n", "gn", "<Plug>(CybuNext)")
+-- vim.keymap.set("n", "gp", "<Plug>(CybuPrev)")
+-- vim.keymap.set("n", "gn", "<Plug>(CybuNext)")
+
+-- Buffers --
+vim.keymap.set("n", "gp", ":bprevious<CR>")
+vim.keymap.set("n", "gn", ":bnext<CR>")
 
 -- Navigator(tmux) --
-vim.keymap.set("n", "<C-h>", "<CMD>NavigatorLeft<CR>")
-vim.keymap.set("n", "<C-l>", "<CMD>NavigatorRight<CR>")
-vim.keymap.set("n", "<C-k>", "<CMD>NavigatorUp<CR>")
-vim.keymap.set("n", "<C-j>", "<CMD>NavigatorDown<CR>")
+-- vim.keymap.set("n", "<C-h>", "<CMD>NavigatorLeft<CR>")
+-- vim.keymap.set("n", "<C-l>", "<CMD>NavigatorRight<CR>")
+-- vim.keymap.set("n", "<C-k>", "<CMD>NavigatorUp<CR>")
+-- vim.keymap.set("n", "<C-j>", "<CMD>NavigatorDown<CR>")
+vim.keymap.set("n", "<C-h>", "<C-w>h")
+vim.keymap.set("n", "<C-l>", "<C-w>l")
+vim.keymap.set("n", "<C-k>", "<C-w>k")
+vim.keymap.set("n", "<C-j>", "<C-w>j")
 
 -- Increment/Decrement --
 vim.keymap.set("n", "<leader>a", "<C-a>", { desc = "Increment" })
@@ -273,18 +264,18 @@ vim.keymap.set("n", "<leader>7", "i&<esc>")
 ------------------------------
 
 -- [[ Highlight on yank ]]
-local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
 	callback = function()
 		vim.highlight.on_yank()
 	end,
-	group = highlight_group,
+	group = vim.api.nvim_create_augroup("YankHighlight", { clear = true }),
 	pattern = "*",
 })
 
 -- Do not put additional comment sign after pressing enter
 vim.cmd("autocmd BufEnter * set formatoptions-=cro")
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
+vim.cmd("autocmd FileType help noremap <buffer> q :q<cr>")
 vim.cmd("autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0")
 vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType c,h set expandtab ts=4 shiftwidth=4 softtabstop=4")
@@ -294,4 +285,7 @@ vim.cmd("autocmd FileType go set expandtab ts=4 shiftwidth=4 softtabstop=4")
 if vim.g.neovide then
     -- Put anything you want to happen only in Neovide here
     vim.o.guifont = "Iosevka:h16"
+    vim.g.neovide_cursor_animation_length = 0.05
+
+    vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
 end
