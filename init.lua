@@ -39,9 +39,23 @@ local plugins = {
 	--"ghillb/cybu.nvim",
 	"kyazdani42/nvim-web-devicons",
 	"norcalli/nvim-colorizer.lua",
-	"kylechui/nvim-surround",
-	"echasnovski/mini.align",
+    { 'echasnovski/mini.nvim', version = false },
+    -- 'echasnovski/mini.surround',
+	-- "echasnovski/mini.align",
 	"bluz71/vim-moonfly-colors",
+    'projekt0n/github-nvim-theme',
+    { "lervag/vimtex",
+        config = function ()
+        vim.g.vimtex_view_general_viewer = 'sumatrapdf'
+        vim.g.vimtex_compiler_method = 'tectonic'
+        end
+    },
+    {
+        'kaarmu/typst.vim',
+        ft = 'typst',
+        lazy=false,
+    },
+    "duane9/nvim-rg",
 	"Tetralux/odin.vim",
     "haringsrob/nvim_context_vt",
 	-- Fuzzy Finder (files, lsp, etc)
@@ -56,15 +70,21 @@ local plugins = {
 	-- 	cond = vim.fn.executable("make") == 1
 	-- },
 
-	-- nvim-qt integration
-	-- "equalsraf/neovim-gui-shim",
-
 	{
 		"folke/which-key.nvim",
 		config = function()
 			require("which-key").setup({})
 		end,
 	},
+    {
+        "smoka7/multicursors.nvim",
+        event = "VeryLazy",
+        dependencies = {
+            'smoka7/hydra.nvim',
+        },
+        opts = {},
+        cmd = { 'MCstart', 'MCvisual', 'MCclear', 'MCpattern', 'MCvisualPattern', 'MCunderCursor' },
+    }
 }
 
 require("lazy").setup(plugins)
@@ -81,7 +101,7 @@ set.showcmd = false -- Show (partial) command in status line
 set.showmode = false
 set.showmatch = true -- Show matching brackets
 set.matchtime = 3 -- Set matching brackets time
-set.cmdheight = 0
+set.cmdheight = 1
 set.cmdwinheight = 10
 
 set.autowrite = true -- Automatically save when editing multiple files
@@ -91,11 +111,11 @@ set.pumheight = 10 -- Pop-up menu height
 
 set.scrolloff = 5
 set.number = true -- Show line numbers
-set.relativenumber = true -- Show line numbers
+set.relativenumber = false -- Show line numbers
 set.signcolumn = "yes"
 set.cursorline = true -- Highlight cursorline
 -- set.cursorcolumn = true       -- Highlight cursorcolumn
-set.colorcolumn = "81,101"
+-- set.colorcolumn = "81,101"
 set.splitbelow = true
 set.splitright = true
 
@@ -107,6 +127,9 @@ set.clipboard = "unnamedplus"
 -- set.spelllang = ru_ru,en_us
 set.langmap = "ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,"
 	.. "фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
+
+-- set path
+set.path = vim.opt.path + 'code/**'
 
 -- ----- Enable folding ----- --
 
@@ -145,7 +168,7 @@ set.cindent = true
 -- Set colorscheme
 set.termguicolors = true
 set.background = "dark"
-vim.cmd([[colorscheme moonfly]])
+vim.cmd([[colorscheme github_dark_high_contrast]])
 
 -- Set completeopt to have a better completion experience
 set.completeopt = "menuone,noselect"
@@ -156,17 +179,18 @@ set.inccommand = "split"
 -------------------------
 
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+vim.g.maplocalleader = '\\'
 
-require("custom.treesitter")
+-- require("custom.treesitter")
 -- require("custom.lsp")
-require("custom.lualine")
---require("custom.cybu")
+-- require("custom.lualine")
+-- require("custom.cybu")
+require("custom.mini")
 
 require("Comment").setup()
 require("Navigator").setup()
-require("nvim-autopairs").setup({})
-require("nvim-surround").setup({})
+--require("nvim-autopairs").setup({})
+--require("nvim-surround").setup({})
 
 -- require('indent_blankline').setup {
 --     char = '┊',
@@ -174,10 +198,8 @@ require("nvim-surround").setup({})
 -- }
 
 require("gitsigns").setup()
-require('mini.align').setup()
-
 require("nvim_context_vt").setup({
-    min_rows = 5,
+    min_rows = 1,
 })
 
 -------------------------
@@ -189,11 +211,19 @@ vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 vim.keymap.set("n", "<leader>l", ":nohl<CR>", { silent = true })
 vim.keymap.set("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
 vim.keymap.set("n", "<leader>ee", ":25Lex<CR>", { silent = true })
-vim.keymap.set("n", "<leader>g", "<C-]>", { silent = true, desc = "Go to definition (CTags)" })
-vim.keymap.set("n", "<leader>G", ":vert botright wincmd ]<CR>", { silent = true, desc = "Go to definition (CTags)" })
-vim.keymap.set("n", "<leader>G", ":vert botright wincmd ]<CR>", { silent = true, desc = "Go to definition (CTags)" })
+
+vim.keymap.set("n", "<C-S>", ":w<CR>")
+
+vim.keymap.set("n", "<leader>G", "<C-]>", { silent = true, desc = "Go to definition (CTags)" })
+vim.keymap.set("n", "<leader>g", "<C-w>}<C-w>H", { silent = true, desc = "Preview definition (CTags)" })
+-- vim.keymap.set("n", "<leader>s", ":ts<CR>", { silent = true, desc = "Select tag (CTags)"})
 vim.keymap.set("n", "<leader>i", "<C-I>", { silent = true, desc = "Jump forward" })
 vim.keymap.set("n", "<leader>o", "<C-O>", { silent = true, desc = "Jump back" })
+
+vim.keymap.set({ 'v', 'n' }, '<Leader>m', '<cmd>MCstart<cr>', {desc = 'Create a selection for selected text or word under the cursor'})
+-- Odin go to def
+set.grepprg = "rg --vimgrep --no-heading --smart-case"
+vim.keymap.set("n", "<leader>r", ":silent lgrep <cword> C:/Users/user/scoop/apps/odin-nightly/2023-07-30/<CR>:lopen<CR>")
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -220,6 +250,8 @@ vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files, { des
 vim.keymap.set("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "[F]ind [H]elp" })
 vim.keymap.set("n", "<leader>fw", require("telescope.builtin").grep_string, { desc = "[F]ind current [W]ord" })
 vim.keymap.set("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "[F]ind by [G]rep" })
+vim.keymap.set("n", "<leader>fj", require("telescope.builtin").jumplist, { desc = "[F]ind in [J]umplist" })
+vim.keymap.set("n", "<leader>ft", require("telescope.builtin").jumplist, { desc = "[F]ind in [T]ags" })
 vim.keymap.set("n", "<leader>fd", require("telescope.builtin").diagnostics, { desc = "[F]ind [D]iagnostics" })
 
 -- Diagnostic keymaps
@@ -259,6 +291,10 @@ vim.keymap.set("n", "<leader>2", "i@<esc>")
 vim.keymap.set("n", "<leader>3", "i#<esc>")
 vim.keymap.set("n", "<leader>4", "i$<esc>")
 vim.keymap.set("n", "<leader>7", "i&<esc>")
+vim.keymap.set("i", "<A-2>", "@")
+vim.keymap.set("i", "<A-3>", "#")
+vim.keymap.set("i", "<A-4>", "$")
+vim.keymap.set("i", "<A-7>", "&")
 ------------------------------
 -- ----- AUTOCOMMANDS ----- --
 ------------------------------
@@ -272,19 +308,41 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	pattern = "*",
 })
 
+-- [[ Autoresize windows ]]
+vim.api.nvim_create_autocmd({ "VimResized" }, {
+  callback = function()
+    vim.cmd "tabdo wincmd ="
+  end,
+})
+
+-- [[ Close with q in readonly buffers ]]
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "qf", "help", "man", "lspinfo", "spectre_panel" },
+  callback = function()
+    vim.cmd [[
+      nnoremap <silent> <buffer> q :close<CR> 
+      set nobuflisted 
+    ]]
+  end,
+})
 -- Do not put additional comment sign after pressing enter
 vim.cmd("autocmd BufEnter * set formatoptions-=cro")
 vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
-vim.cmd("autocmd FileType help noremap <buffer> q :q<cr>")
 vim.cmd("autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0")
 vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType c,h set expandtab ts=4 shiftwidth=4 softtabstop=4")
-vim.cmd("autocmd FileType odin set expandtab ts=4 shiftwidth=4 softtabstop=4")
+vim.cmd("autocmd FileType odin set expandtab ts=2 shiftwidth=2 softtabstop=2")
 vim.cmd("autocmd FileType go set expandtab ts=4 shiftwidth=4 softtabstop=4")
+vim.cmd("autocmd FileType typ set expandtab ts=2 shiftwidth=2 softtabstop=2 nu linebreak")
+
+if vim.g.nvy then
+    vim.o.guifont = "Iosevka:h16"
+    vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
+end
 
 if vim.g.neovide then
     -- Put anything you want to happen only in Neovide here
-    vim.o.guifont = "Iosevka:h16"
+    vim.o.guifont = "Iosevka:h15"
     vim.g.neovide_cursor_animation_length = 0.05
 
     vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
