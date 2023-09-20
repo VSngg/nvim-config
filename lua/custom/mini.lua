@@ -41,4 +41,3 @@ starter.setup({
     },
 })
 
-require('mini.files').setup()
