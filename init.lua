@@ -30,46 +30,20 @@ local plugins = {
 	"tpope/vim-rhubarb",
 	"lewis6991/gitsigns.nvim",
 
-	"numToStr/Navigator.nvim",
 	"windwp/nvim-autopairs",
-	"nvim-lualine/lualine.nvim", -- Fancier statusline
 	"lukas-reineke/indent-blankline.nvim", -- Add indentation guides even on blank lines
 	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
-	-- "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
-	--"ghillb/cybu.nvim",
 	"kyazdani42/nvim-web-devicons",
 	"norcalli/nvim-colorizer.lua",
     { 'echasnovski/mini.nvim', version = false },
-    -- 'echasnovski/mini.surround',
-	-- "echasnovski/mini.align",
 	"bluz71/vim-moonfly-colors",
     'projekt0n/github-nvim-theme',
-    { "lervag/vimtex",
-        config = function ()
-        vim.g.vimtex_view_general_viewer = 'sumatrapdf'
-        vim.g.vimtex_compiler_method = 'tectonic'
-        end
-    },
-    {
-        'kaarmu/typst.vim',
-        ft = 'typst',
-        lazy=false,
-    },
+    { 'kaarmu/typst.vim', ft = 'typst', lazy=false, },
     "duane9/nvim-rg",
 	"Tetralux/odin.vim",
     "haringsrob/nvim_context_vt",
 	-- Fuzzy Finder (files, lsp, etc)
-	{ "nvim-telescope/telescope.nvim",
-		branch = "0.1.x",
-		dependencies = { "nvim-lua/plenary.nvim" }
-	},
-
-	-- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
-	-- { "nvim-telescope/telescope-fzf-native.nvim",
-	-- 	build = "make",
-	-- 	cond = vim.fn.executable("make") == 1
-	-- },
-
+	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
 	{
 		"folke/which-key.nvim",
 		config = function()
@@ -183,19 +157,9 @@ vim.g.maplocalleader = '\\'
 
 -- require("custom.treesitter")
 -- require("custom.lsp")
--- require("custom.lualine")
--- require("custom.cybu")
 require("custom.mini")
 
 require("Comment").setup()
-require("Navigator").setup()
---require("nvim-autopairs").setup({})
---require("nvim-surround").setup({})
-
--- require('indent_blankline').setup {
---     char = '┊',
---     show_trailing_blankline_indent = false,
--- }
 
 require("gitsigns").setup()
 require("nvim_context_vt").setup({
@@ -216,14 +180,11 @@ vim.keymap.set("n", "<C-S>", ":w<CR>")
 
 vim.keymap.set("n", "<leader>G", "<C-]>", { silent = true, desc = "Go to definition (CTags)" })
 vim.keymap.set("n", "<leader>g", "<C-w>}<C-w>H", { silent = true, desc = "Preview definition (CTags)" })
--- vim.keymap.set("n", "<leader>s", ":ts<CR>", { silent = true, desc = "Select tag (CTags)"})
+
 vim.keymap.set("n", "<leader>i", "<C-I>", { silent = true, desc = "Jump forward" })
 vim.keymap.set("n", "<leader>o", "<C-O>", { silent = true, desc = "Jump back" })
 
 vim.keymap.set({ 'v', 'n' }, '<Leader>m', '<cmd>MCstart<cr>', {desc = 'Create a selection for selected text or word under the cursor'})
--- Odin go to def
-set.grepprg = "rg --vimgrep --no-heading --smart-case"
-vim.keymap.set("n", "<leader>r", ":silent lgrep <cword> C:/Users/user/scoop/apps/odin-nightly/2023-07-30/<CR>:lopen<CR>")
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -259,19 +220,10 @@ vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics" })
 
--- Cybu --
--- vim.keymap.set("n", "gp", "<Plug>(CybuPrev)")
--- vim.keymap.set("n", "gn", "<Plug>(CybuNext)")
-
 -- Buffers --
 vim.keymap.set("n", "gp", ":bprevious<CR>")
 vim.keymap.set("n", "gn", ":bnext<CR>")
 
--- Navigator(tmux) --
--- vim.keymap.set("n", "<C-h>", "<CMD>NavigatorLeft<CR>")
--- vim.keymap.set("n", "<C-l>", "<CMD>NavigatorRight<CR>")
--- vim.keymap.set("n", "<C-k>", "<CMD>NavigatorUp<CR>")
--- vim.keymap.set("n", "<C-j>", "<CMD>NavigatorDown<CR>")
 vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
