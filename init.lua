@@ -14,51 +14,45 @@ vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
     "lifepillar/vim-mucomplete",
-
-	{ -- Highlight, edit, and navigate code
-		"nvim-treesitter/nvim-treesitter",
-		build = function()
-			pcall(require("nvim-treesitter.install").update({ with_sync = true }))
-		end,
-	},
-
-	"nvim-treesitter/nvim-treesitter-textobjects",
+    'ishan9299/modus-theme-vim',
+	-- "nvim-treesitter/nvim-treesitter-textobjects",
 	"jose-elias-alvarez/null-ls.nvim",
 
 	-- Git related plugins
-	"tpope/vim-fugitive",
-	"tpope/vim-rhubarb",
+	-- "tpope/vim-fugitive",
+	-- "tpope/vim-rhubarb",
 	"lewis6991/gitsigns.nvim",
 
 	"windwp/nvim-autopairs",
 	"lukas-reineke/indent-blankline.nvim", -- Add indentation guides even on blank lines
 	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
 	"kyazdani42/nvim-web-devicons",
-	"norcalli/nvim-colorizer.lua",
+	-- "norcalli/nvim-colorizer.lua",
     { 'echasnovski/mini.nvim', version = false },
 	"bluz71/vim-moonfly-colors",
     'projekt0n/github-nvim-theme',
     { 'kaarmu/typst.vim', ft = 'typst', lazy=false, },
     "duane9/nvim-rg",
 	"Tetralux/odin.vim",
+    "tikhomirov/vim-glsl",
     "haringsrob/nvim_context_vt",
+    'shoumodip/compile.nvim',
+
 	-- Fuzzy Finder (files, lsp, etc)
-	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
+	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } , },
 	{
 		"folke/which-key.nvim",
 		config = function()
 			require("which-key").setup({})
 		end,
 	},
-    {
-        "smoka7/multicursors.nvim",
-        event = "VeryLazy",
+    { "nvim-neo-tree/neo-tree.nvim",
+        branch = "v3.x",
         dependencies = {
-            'smoka7/hydra.nvim',
-        },
-        opts = {},
-        cmd = { 'MCstart', 'MCvisual', 'MCclear', 'MCpattern', 'MCvisualPattern', 'MCunderCursor' },
-    }
+            "nvim-lua/plenary.nvim",
+            "MunifTanjim/nui.nvim",
+        }
+    },
 }
 
 require("lazy").setup(plugins)
@@ -71,7 +65,7 @@ local set = vim.opt
 
 vim.cmd([[language en_US]])
 
-set.showcmd = false -- Show (partial) command in status line
+set.showcmd = true -- Show (partial) command in status line
 set.showmode = false
 set.showmatch = true -- Show matching brackets
 set.matchtime = 3 -- Set matching brackets time
@@ -95,7 +89,7 @@ set.splitright = true
 
 set.mouse = "a"
 set.swapfile = false
-set.report = 0 -- Tell when anyting is changed by : <cmd>
+set.report = 2 -- Tell when anyting is changed by : <cmd>
 set.clipboard = "unnamedplus"
 
 -- set.spelllang = ru_ru,en_us
@@ -165,7 +159,14 @@ require("gitsigns").setup()
 require("nvim_context_vt").setup({
     min_rows = 1,
 })
-
+local compile = require("compile")
+compile.bind {
+  ["n"] = compile.next,      -- Open the next error
+  ["p"] = compile.prev,      -- Open the previous error
+  ["o"] = compile.this,      -- Open the error under the cursor
+  ["r"] = compile.restart,   -- Restart the compilation process
+  ["q"] = compile.interrupt, -- Kill the compilation process
+}
 -------------------------
 -- ----- KEYMAPS ----- --
 -------------------------
@@ -174,17 +175,17 @@ vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
 vim.keymap.set("n", "<leader>l", ":nohl<CR>", { silent = true })
 vim.keymap.set("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
-vim.keymap.set("n", "<leader>ee", ":25Lex<CR>", { silent = true })
+vim.keymap.set("n", "<leader>ee", ":Neotree<CR>", { silent = true })
 
 vim.keymap.set("n", "<C-S>", ":w<CR>")
+vim.keymap.set("n", "<leader>cd", ":cd %:h<CR>")
+vim.keymap.set("n", "<leader>cc", ":Compile<CR>")
 
 vim.keymap.set("n", "<leader>G", "<C-]>", { silent = true, desc = "Go to definition (CTags)" })
 vim.keymap.set("n", "<leader>g", "<C-w>}<C-w>H", { silent = true, desc = "Preview definition (CTags)" })
 
 vim.keymap.set("n", "<leader>i", "<C-I>", { silent = true, desc = "Jump forward" })
 vim.keymap.set("n", "<leader>o", "<C-O>", { silent = true, desc = "Jump back" })
-
-vim.keymap.set({ 'v', 'n' }, '<Leader>m', '<cmd>MCstart<cr>', {desc = 'Create a selection for selected text or word under the cursor'})
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -194,7 +195,7 @@ vim.keymap.set({ "n", "x", "o" }, "H", "g^")
 vim.keymap.set({ "n", "x", "o" }, "L", "g$")
 
 -- Put semicolon at the end of the line
-vim.keymap.set("i", "<A-;>", "<Esc>miA;<Esc>`ii")
+vim.keymap.set("i", "<A-;>", "<Esc>miA;<Esc>`ia")
 
 -- Telescope keybinds
 vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
@@ -247,6 +248,26 @@ vim.keymap.set("i", "<A-2>", "@")
 vim.keymap.set("i", "<A-3>", "#")
 vim.keymap.set("i", "<A-4>", "$")
 vim.keymap.set("i", "<A-7>", "&")
+
+
+-- edit temp file
+local charset = {}  do -- [0-9a-zA-Z]
+    for c = 48, 57  do table.insert(charset, string.char(c)) end
+    for c = 65, 90  do table.insert(charset, string.char(c)) end
+    for c = 97, 122 do table.insert(charset, string.char(c)) end
+end
+
+local function randomString(length)
+    if not length or length <= 0 then return '' end
+    math.randomseed(os.clock()^5)
+    return randomString(length - 1) .. charset[math.random(1, #charset)]
+end
+
+vim.keymap.set(
+    "n", "<leader>tf", ":e "..randomString(10)..".txt<CR>",
+    { desc = "Edit random temp file"}
+    )
+
 ------------------------------
 -- ----- AUTOCOMMANDS ----- --
 ------------------------------
@@ -283,19 +304,11 @@ vim.cmd("autocmd BufEnter * setlocal formatoptions-=cro")
 vim.cmd("autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0")
 vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType c,h set expandtab ts=4 shiftwidth=4 softtabstop=4")
-vim.cmd("autocmd FileType odin set expandtab ts=2 shiftwidth=2 softtabstop=2")
+vim.cmd("autocmd FileType odin set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType go set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType typ set expandtab ts=2 shiftwidth=2 softtabstop=2 nu linebreak")
 
 if vim.g.nvy then
-    vim.o.guifont = "Iosevka:h16"
-    vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
-end
-
-if vim.g.neovide then
-    -- Put anything you want to happen only in Neovide here
-    vim.o.guifont = "Iosevka:h15"
-    vim.g.neovide_cursor_animation_length = 0.05
-
+    vim.o.guifont = "Iosevka:h12"
     vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
 end

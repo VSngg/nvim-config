@@ -29,15 +29,10 @@ require('mini.statusline').setup({
   },
 })
 require('mini.tabline').setup()
-local starter = require('mini.starter')
-starter.setup({
-    items = {
-      starter.sections.telescope(),
-      starter.sections.recent_files(),
-    },
-    content_hooks = {
-      starter.gen_hook.adding_bullet(),
-      starter.gen_hook.aligning('center', 'center'),
-    },
+require('mini.basics').setup({
+    options = {
+        basic = true,
+        extra_ui = true,
+        win_borders = 'double',
+    }
 })
-
