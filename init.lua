@@ -85,6 +85,17 @@ local plugins = {
 			require("which-key").setup({})
 		end,
 	},
+	{
+	  "nvim-neo-tree/neo-tree.nvim",
+	  version = "*",
+	  dependencies = {
+		"nvim-lua/plenary.nvim",
+		"MunifTanjim/nui.nvim",
+	  },
+	  config = function ()
+		require('neo-tree').setup {}
+	  end,
+	},
 }
 
 require("lazy").setup(plugins)
@@ -95,7 +106,7 @@ require("lazy").setup(plugins)
 
 local set = vim.opt
 
-vim.cmd([[language en_US]])
+--vim.cmd([[language en_US]])
 
 set.showcmd = false -- Show (partial) command in status line
 set.showmode = false
@@ -111,7 +122,7 @@ set.pumheight = 10 -- Pop-up menu height
 
 set.scrolloff = 5
 set.number = true -- Show line numbers
-set.relativenumber = true -- Show line numbers
+set.relativenumber = false -- Show line numbers
 set.signcolumn = "yes"
 set.cursorline = true -- Highlight cursorline
 -- set.cursorcolumn = true       -- Highlight cursorcolumn
@@ -224,11 +235,11 @@ vim.keymap.set("i", "<A-;>", "<Esc>miA;<Esc>`ii")
 
 -- Telescope keybinds
 vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
-vim.keymap.set("n", "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
+vim.keymap.set("n", "<leader>b", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
 vim.keymap.set("n", "<leader>/", function()
 	-- You can pass additional configuration to telescope to change theme, layout, etc.
 	require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-		winblend = 10,
+		winblend = 20,
 		previewer = false,
 	}))
 end, { desc = "[/] Fuzzily search in current buffer]" })
@@ -262,6 +273,9 @@ vim.keymap.set("n", "<down>", "<C-x>", { desc = "Decrement" })
 
 -- Formatting --
 vim.keymap.set("n", "<leader>F", vim.lsp.buf.format, { desc = "Format buffer"})
+
+-- NeoTree --
+vim.keymap.set("n", "<leader>e", "<CMD>NeoTreeRevealToggle<CR>")
 
 -- insert en_US symbols from russian keyboard --
 vim.keymap.set("n", "<leader>2", "i@<esc>")

@@ -33,4 +33,3 @@
   "vim-moonfly-colors": { "branch": "master", "commit": "b18fa11e40ddf11cca2acb93502214a652dc5813" },
   "vim-rhubarb": { "branch": "master", "commit": "ee69335de176d9325267b0fd2597a22901d927b1" },
   "which-key.nvim": { "branch": "main", "commit": "38b990f6eabf62014018b4aae70a97d7a6c2eb88" }
-}
