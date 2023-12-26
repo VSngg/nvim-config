@@ -69,13 +69,11 @@ set.hidden = true -- Hide buffers when they are abandoned
 set.encoding = "utf-8"
 set.pumheight = 10 -- Pop-up menu height
 
-set.scrolloff = 5
+set.scrolloff = 10
 set.number = true -- Show line numbers
 set.relativenumber = false -- Show line numbers
 set.signcolumn = "yes"
 set.cursorline = true -- Highlight cursorline
--- set.cursorcolumn = true       -- Highlight cursorcolumn
--- set.colorcolumn = "81,101"
 set.splitbelow = true
 set.splitright = true
 
@@ -143,34 +141,7 @@ vim.g.maplocalleader = '\\'
 
 require('mini.align').setup()
 require('mini.surround').setup()
-require('mini.statusline').setup({
-  content = {
-    active = function()
-      local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
-      local spell         = vim.wo.spell and (MiniStatusline.is_truncated(120) and 'S' or 'SPELL') or ''
-      local wrap          = vim.wo.wrap  and (MiniStatusline.is_truncated(120) and 'W' or 'WRAP')  or ''
-      local git           = MiniStatusline.section_git({ trunc_width = 75 })
-      local diagnostics   = MiniStatusline.section_diagnostics({ trunc_width = 75 })
-      local filename      = MiniStatusline.section_filename({ trunc_width = 140 })
-      local fileinfo      = MiniStatusline.section_fileinfo({ trunc_width = 120 })
-      local searchcount   = MiniStatusline.section_searchcount({ trunc_width = 75})
-      local location      = MiniStatusline.section_location({ trunc_width = 75 })
-
-      -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
-      -- correct padding with spaces between groups (accounts for 'missing'
-      -- sections, etc.)
-      return MiniStatusline.combine_groups({
-        { hl = mode_hl,                  strings = { mode, spell} },
-        { hl = 'MiniStatuslineDevinfo',  strings = { git, diagnostics } },
-        '%<', -- Mark general truncate point
-        { hl = 'MiniStatuslineFilename', strings = { filename } },
-        '%=', -- End left alignment
-        { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-        { hl = mode_hl,                  strings = { searchcount, location } },
-      })
-    end,
-  },
-})
+require('mini.statusline').setup({ set_vim_settings = false, })
 require('mini.tabline').setup()
 require('mini.basics').setup({
     options = {
@@ -309,20 +280,20 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 -- [[ Autoresize windows ]]
 vim.api.nvim_create_autocmd({ "VimResized" }, {
-  callback = function()
-    vim.cmd "tabdo wincmd ="
-  end,
+    callback = function()
+        vim.cmd "tabdo wincmd ="
+    end,
 })
 
 -- [[ Close with q in readonly buffers ]]
 vim.api.nvim_create_autocmd({ "FileType" }, {
-  pattern = { "qf", "help", "man", "lspinfo", "spectre_panel" },
-  callback = function()
-    vim.cmd [[
-      nnoremap <silent> <buffer> q :close<CR> 
-      set nobuflisted 
-    ]]
-  end,
+    pattern = { "qf", "help", "man", "lspinfo", "spectre_panel" },
+    callback = function()
+        vim.cmd [[
+        nnoremap <silent> <buffer> q :close<CR> 
+        set nobuflisted 
+        ]]
+    end,
 })
 -- Do not put additional comment sign after pressing enter
 vim.cmd("autocmd BufEnter * set formatoptions-=cro")
@@ -335,6 +306,6 @@ vim.cmd("autocmd FileType go set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType typ set expandtab ts=2 shiftwidth=2 softtabstop=2 nu linebreak")
 
 if vim.g.nvy then
-    vim.o.guifont = "Iosevka:h12"
+    vim.o.guifont = "Iosevka:h13"
     vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
 end
