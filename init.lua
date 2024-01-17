@@ -18,7 +18,6 @@ local plugins = {
 	"lewis6991/gitsigns.nvim",
 
 	"windwp/nvim-autopairs",
-	"lukas-reineke/indent-blankline.nvim", -- Add indentation guides even on blank lines
 	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
 	"kyazdani42/nvim-web-devicons",
     { 'echasnovski/mini.nvim', version = false },
@@ -30,6 +29,16 @@ local plugins = {
     "haringsrob/nvim_context_vt",
     'shoumodip/compile.nvim',
 
+    -- Add indentation guides even on blank lines
+    { "lukas-reineke/indent-blankline.nvim",
+        config = function()
+            require("ibl").setup({
+                indent = { highlight = "Whitespace", char = '▏' },
+                scope = { enabled = false },
+            })
+        end,
+
+    },
 	-- Fuzzy Finder (files, lsp, etc)
 	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } , },
 	{
@@ -86,9 +95,6 @@ set.clipboard = "unnamedplus"
 set.langmap = "ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,"
 	.. "фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
 
--- set path
-set.path = vim.opt.path + 'code/**'
-
 -- ----- Enable folding ----- --
 
 set.foldmethod = "indent"
@@ -143,13 +149,6 @@ require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.statusline').setup({ set_vim_settings = false, })
 require('mini.tabline').setup()
-require('mini.basics').setup({
-    options = {
-        basic = true,
-        extra_ui = true,
-        win_borders = 'double',
-    }
-})
 require("Comment").setup()
 
 require("gitsigns").setup()
@@ -245,25 +244,6 @@ vim.keymap.set("i", "<A-2>", "@")
 vim.keymap.set("i", "<A-3>", "#")
 vim.keymap.set("i", "<A-4>", "$")
 vim.keymap.set("i", "<A-7>", "&")
-
-
--- edit temp file
-local charset = {}  do -- [0-9a-zA-Z]
-    for c = 48, 57  do table.insert(charset, string.char(c)) end
-    for c = 65, 90  do table.insert(charset, string.char(c)) end
-    for c = 97, 122 do table.insert(charset, string.char(c)) end
-end
-
-local function randomString(length)
-    if not length or length <= 0 then return '' end
-    math.randomseed(os.clock()^5)
-    return randomString(length - 1) .. charset[math.random(1, #charset)]
-end
-
-vim.keymap.set(
-    "n", "<leader>tf", ":e "..randomString(10)..".txt<CR>",
-    { desc = "Edit random temp file"}
-    )
 
 ------------------------------
 -- ----- AUTOCOMMANDS ----- --
