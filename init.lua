@@ -28,6 +28,7 @@ local plugins = {
     "tikhomirov/vim-glsl",
     "haringsrob/nvim_context_vt",
     'shoumodip/compile.nvim',
+    "nvim-pack/nvim-spectre",
 
     -- Add indentation guides even on blank lines
     { "lukas-reineke/indent-blankline.nvim",
@@ -43,7 +44,23 @@ local plugins = {
 	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } , },
 	{
 		"folke/which-key.nvim",
+        enabled = true,
+        dependencies = { 'Wansmer/langmapper.nvim' },
 		config = function()
+            vim.o.timeout = true
+            vim.o.timeoutlen = 300
+
+            local lmu = require('langmapper.utils')
+            local view = require('which-key.view')
+            local execute = view.execute
+
+            -- wrap `execute()` and translate sequence back
+            view.execute = function(prefix_i, mode, buf)
+                -- Translate back to English characters
+                prefix_i = lmu.translate_keycode(prefix_i, 'default', 'ru')
+                execute(prefix_i, mode, buf)
+            end
+
 			require("which-key").setup({})
 		end,
 	},
@@ -52,8 +69,36 @@ local plugins = {
         dependencies = {
             "nvim-lua/plenary.nvim",
             "MunifTanjim/nui.nvim",
-        }
+        },
+
+        config = function()
+            require("neo-tree").setup({
+                filesystem = {
+                    window = {
+                        width = "20%",
+                        position = "left",
+                    },
+                    hijack_netrw_behavior = "open_current",
+                },
+            })
+        end,
     },
+    {
+        'Wansmer/langmapper.nvim',
+        lazy = false,
+        priority = 1, -- High priority is needed if you will use `autoremap()`
+        config = function()
+            require('langmapper').setup({--[[ your config ]]})
+        end,
+    },
+	{
+		"epwalsh/obsidian.nvim",
+		version = "*",  -- recommended, use latest release instead of latest commit
+		lazy = true,
+		ft = "markdown",
+		dependencies = { "nvim-lua/plenary.nvim", },
+		opts = {},
+	}
 }
 
 require("lazy").setup(plugins)
@@ -85,20 +130,36 @@ set.signcolumn = "yes"
 set.cursorline = true -- Highlight cursorline
 set.splitbelow = true
 set.splitright = true
+set.linebreak = true
 
 set.mouse = "a"
 set.swapfile = false
 set.report = 2 -- Tell when anyting is changed by : <cmd>
 set.clipboard = "unnamedplus"
 
--- set.spelllang = ru_ru,en_us
-set.langmap = "ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,"
-	.. "фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
+-- Langmap --
+local function escape(str)
+  -- You need to escape these characters to work correctly
+  local escape_chars = [[;,."|\]]
+  return vim.fn.escape(str, escape_chars)
+end
 
+-- Recommended to use lua template string
+local en = [[`qwertyuiop[]asdfghjkl;'zxcvbnm]]
+local ru = [[ёйцукенгшщзхъфывапролджэячсмить]]
+local en_shift = [[~QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>]]
+local ru_shift = [[ËЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ]]
+
+vim.opt.langmap = vim.fn.join({
+    -- | `to` should be first     | `from` should be second
+    escape(ru_shift) .. ';' .. escape(en_shift),
+    escape(ru) .. ';' .. escape(en),
+}, ',')
 -- ----- Enable folding ----- --
 
 set.foldmethod = "indent"
 set.foldlevel = 256
+set.conceallevel = 1
 
 -- ----- Statusline ----- --
 
@@ -166,84 +227,87 @@ compile.bind {
 -------------------------
 -- ----- KEYMAPS ----- --
 -------------------------
+local map = vim.keymap.set
 
-vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
+map({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
-vim.keymap.set("n", "<leader>l", ":nohl<CR>", { silent = true })
-vim.keymap.set("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
-vim.keymap.set("n", "<leader>ee", ":Neotree<CR>", { silent = true })
+map("n", "<leader>l", ":nohl<CR>", { silent = true })
+map("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
+map("n", "<leader>ee", ":Neotree toggle<CR>", { silent = true })
 
-vim.keymap.set("n", "<C-S>", ":w<CR>")
-vim.keymap.set("n", "<leader>cd", ":cd %:h<CR>")
-vim.keymap.set("n", "<leader>cc", ":Compile<CR>")
+map("n", "<leader>mf", ":ObsidianFollowLink<CR>", { silent = true })
 
-vim.keymap.set("n", "<leader>G", "<C-]>", { silent = true, desc = "Go to definition (CTags)" })
-vim.keymap.set("n", "<leader>g", "<C-w>}<C-w>H", { silent = true, desc = "Preview definition (CTags)" })
+map("n", "<C-S>", ":w<CR>")
+map("n", "<leader>cd", ":cd %:h<CR>")
+map("n", "<leader>cc", ":Compile<CR>")
 
-vim.keymap.set("n", "<leader>i", "<C-I>", { silent = true, desc = "Jump forward" })
-vim.keymap.set("n", "<leader>o", "<C-O>", { silent = true, desc = "Jump back" })
+map("n", "<leader>i", "<C-I>", { silent = true, desc = "Jump forward" })
+map("n", "<leader>o", "<C-O>", { silent = true, desc = "Jump back" })
+map("n", "<leader>v", "<C-V>", { silent = true, desc = "Enter visual block mode" })
 
 -- Remap for dealing with word wrap
-vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
-vim.keymap.set({ "n", "x", "o" }, "H", "g^")
-vim.keymap.set({ "n", "x", "o" }, "L", "g$")
+map({ "n", "x", "o" }, "H", "^")
+map({ "n", "x", "o" }, "L", "$")
 
--- Put semicolon at the end of the line
-vim.keymap.set("i", "<A-;>", "<Esc>miA;<Esc>`ia")
+-- Put semicolon at the end of the line --
+map("i", "<A-;>", "<Esc>miA;<Esc>`ia")
 
--- Telescope keybinds
-vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
-vim.keymap.set("n", "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
-vim.keymap.set("n", "<leader>/", function()
-	-- You can pass additional configuration to telescope to change theme, layout, etc.
-	require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-		winblend = 10,
-		previewer = false,
-	}))
-end, { desc = "[/] Fuzzily search in buffer]" })
+-- Telescope keybinds --
+map("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
+map("n", "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
+map("n", "<leader>/", require("telescope.builtin").current_buffer_fuzzy_find, { desc = "[/] Fuzzily search in buffer]" })
+map("n", "<leader>ff", require("telescope.builtin").find_files, { desc = "[F]ind [F]iles" })
+map("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "[F]ind [H]elp" })
+map("n", "<leader>fw", require("telescope.builtin").grep_string, { desc = "[F]ind current [W]ord" })
+map("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "[F]ind by [G]rep" })
+map("n", "<leader>fj", require("telescope.builtin").jumplist, { desc = "[F]ind in [J]umplist" })
+map("n", "<leader>ft", require("telescope.builtin").jumplist, { desc = "[F]ind in [T]ags" })
+map("n", "<leader>fd", require("telescope.builtin").diagnostics, { desc = "[F]ind [D]iagnostics" })
 
-vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files, { desc = "[F]ind [F]iles" })
-vim.keymap.set("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "[F]ind [H]elp" })
-vim.keymap.set("n", "<leader>fw", require("telescope.builtin").grep_string, { desc = "[F]ind current [W]ord" })
-vim.keymap.set("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "[F]ind by [G]rep" })
-vim.keymap.set("n", "<leader>fj", require("telescope.builtin").jumplist, { desc = "[F]ind in [J]umplist" })
-vim.keymap.set("n", "<leader>ft", require("telescope.builtin").jumplist, { desc = "[F]ind in [T]ags" })
-vim.keymap.set("n", "<leader>fd", require("telescope.builtin").diagnostics, { desc = "[F]ind [D]iagnostics" })
+-- Spectre (search and replace) --
+map('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', {
+    desc = "Toggle Spectre"
+})
+map('n', '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', {
+    desc = "Search current word"
+})
+map('v', '<leader>sw', '<esc><cmd>lua require("spectre").open_visual()<CR>', {
+    desc = "Search current word"
+})
 
--- Diagnostic keymaps
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
-vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics" })
+-- Diagnostic keymaps --
+map("n", "[d", vim.diagnostic.goto_prev)
+map("n", "]d", vim.diagnostic.goto_next)
+map("n", "<leader>k", vim.diagnostic.open_float, { desc = "Open diagnostics" })
 
 -- Buffers --
-vim.keymap.set("n", "gp", ":bprevious<CR>")
-vim.keymap.set("n", "gn", ":bnext<CR>")
+map("n", "gp", ":bprevious<CR>")
+map("n", "gn", ":bnext<CR>")
 
-vim.keymap.set("n", "<C-h>", "<C-w>h")
-vim.keymap.set("n", "<C-l>", "<C-w>l")
-vim.keymap.set("n", "<C-k>", "<C-w>k")
-vim.keymap.set("n", "<C-j>", "<C-w>j")
+-- Window movement --
+map("n", "<C-h>", "<C-w>h")
+map("n", "<C-l>", "<C-w>l")
+map("n", "<C-k>", "<C-w>k")
+map("n", "<C-j>", "<C-w>j")
 
 -- Increment/Decrement --
-vim.keymap.set("n", "<leader>a", "<C-a>", { desc = "Increment" })
-vim.keymap.set("n", "<leader>x", "<C-x>", { desc = "Decrement" })
-vim.keymap.set("n", "<up>", "<C-a>", { desc = "Increment" })
-vim.keymap.set("n", "<down>", "<C-x>", { desc = "Decrement" })
-
--- Formatting --
-vim.keymap.set("n", "<leader>F", vim.lsp.buf.format, { desc = "Format buffer"})
+map("n", "<leader>a", "<C-a>", { desc = "Increment" })
+map("n", "<leader>x", "<C-x>", { desc = "Decrement" })
+map("n", "<up>", "<C-a>", { desc = "Increment" })
+map("n", "<down>", "<C-x>", { desc = "Decrement" })
 
 -- insert en_US symbols from russian keyboard --
-vim.keymap.set("n", "<leader>2", "i@<esc>")
-vim.keymap.set("n", "<leader>3", "i#<esc>")
-vim.keymap.set("n", "<leader>4", "i$<esc>")
-vim.keymap.set("n", "<leader>7", "i&<esc>")
-vim.keymap.set("i", "<A-2>", "@")
-vim.keymap.set("i", "<A-3>", "#")
-vim.keymap.set("i", "<A-4>", "$")
-vim.keymap.set("i", "<A-7>", "&")
+map("n", "<leader>2", "i@<esc>", { desc = "Insert @" })
+map("n", "<leader>3", "i#<esc>", { desc = "Insert #" })
+map("n", "<leader>4", "i$<esc>", { desc = "Insert $" })
+map("n", "<leader>7", "i&<esc>", { desc = "Insert &" })
+map("i", "<A-2>", "@")
+map("i", "<A-3>", "#")
+map("i", "<A-4>", "$")
+map("i", "<A-7>", "&")
 
 ------------------------------
 -- ----- AUTOCOMMANDS ----- --
@@ -287,5 +351,6 @@ vim.cmd("autocmd FileType typ set expandtab ts=2 shiftwidth=2 softtabstop=2 nu l
 
 if vim.g.nvy then
     vim.o.guifont = "Iosevka:h13"
-    vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
+    map({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
 end
+require('langmapper').automapping({ global = true, buffer = true })
