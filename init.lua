@@ -124,7 +124,7 @@ require("lazy").setup(plugins)
 
 local set = vim.opt
 
-vim.cmd([[language en_US]])
+if vim.fn.has("win32") == 1 then vim.cmd([[language en_US]]) end
 
 -- set.showcmd = true -- Show (partial) command in status line
 set.showmode = false
