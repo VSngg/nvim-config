@@ -353,4 +353,11 @@ if vim.g.nvy then
     vim.o.guifont = "Iosevka:h13"
     map({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
 end
+
+if vim.g.neovide then
+    vim.o.guifont = "Iosevka Nerd Font:h16"
+    vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
+    vim.g.neovide_scroll_animation_length = 0.2
+    vim.g.neovide_cursor_trail_size = 0.2
+end
 require('langmapper').automapping({ global = true, buffer = true })
