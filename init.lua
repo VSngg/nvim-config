@@ -13,14 +13,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
-    "lifepillar/vim-mucomplete",
-
-	"lewis6991/gitsigns.nvim",
-
-	"windwp/nvim-autopairs",
-	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
+    {"lewis6991/gitsigns.nvim", opts={}},
 	"kyazdani42/nvim-web-devicons",
-    { 'echasnovski/mini.nvim', version = false },
 	"bluz71/vim-moonfly-colors",
     'projekt0n/github-nvim-theme',
     { 'kaarmu/typst.vim', ft = 'typst', lazy=false, },
@@ -30,6 +24,16 @@ local plugins = {
     'shoumodip/compile.nvim',
     "nvim-pack/nvim-spectre",
 
+    { 'echasnovski/mini.nvim', version = false,
+        config = function()
+            require('mini.align').setup()
+            require('mini.surround').setup()
+            require('mini.statusline').setup({ set_vim_settings = false, })
+            require('mini.tabline').setup()
+            require('mini.completion').setup({})
+            require('mini.comment').setup()
+        end,
+    },
     -- Add indentation guides even on blank lines
     { "lukas-reineke/indent-blankline.nvim",
         config = function()
@@ -97,7 +101,18 @@ local plugins = {
 		lazy = true,
 		ft = "markdown",
 		dependencies = { "nvim-lua/plenary.nvim", },
-		opts = {},
+		opts = {
+            workspaces = {
+                {
+                    name = "personal",
+                    path = "~/vaults/personal",
+                },
+                {
+                    name = "work",
+                    path = "~/vaults/work",
+                },
+            },
+        },
 	}
 }
 
@@ -111,7 +126,7 @@ local set = vim.opt
 
 vim.cmd([[language en_US]])
 
-set.showcmd = true -- Show (partial) command in status line
+-- set.showcmd = true -- Show (partial) command in status line
 set.showmode = false
 set.showmatch = true -- Show matching brackets
 set.matchtime = 3 -- Set matching brackets time
@@ -125,7 +140,6 @@ set.pumheight = 10 -- Pop-up menu height
 
 set.scrolloff = 10
 set.number = true -- Show line numbers
-set.relativenumber = false -- Show line numbers
 set.signcolumn = "yes"
 set.cursorline = true -- Highlight cursorline
 set.splitbelow = true
@@ -134,7 +148,6 @@ set.linebreak = true
 
 set.mouse = "a"
 set.swapfile = false
-set.report = 2 -- Tell when anyting is changed by : <cmd>
 set.clipboard = "unnamedplus"
 
 -- Langmap --
@@ -160,14 +173,6 @@ vim.opt.langmap = vim.fn.join({
 set.foldmethod = "indent"
 set.foldlevel = 256
 set.conceallevel = 1
-
--- ----- Statusline ----- --
-
-set.ruler = true
-set.laststatus = 3 --always show status line
-set.showtabline = 1
-
-set.history = 2500
 
 -- ----- Search ----- --
 
@@ -196,7 +201,7 @@ set.background = "dark"
 vim.cmd([[colorscheme github_dark_high_contrast]])
 
 -- Set completeopt to have a better completion experience
-set.completeopt = "menuone,noselect"
+set.completeopt = "menuone,noselect,preview"
 set.inccommand = "split"
 
 -------------------------
@@ -206,23 +211,16 @@ set.inccommand = "split"
 vim.g.mapleader = " "
 vim.g.maplocalleader = '\\'
 
-require('mini.align').setup()
-require('mini.surround').setup()
-require('mini.statusline').setup({ set_vim_settings = false, })
-require('mini.tabline').setup()
-require("Comment").setup()
-
-require("gitsigns").setup()
 require("nvim_context_vt").setup({
     min_rows = 1,
 })
 local compile = require("compile")
 compile.bind {
-  ["n"] = compile.next,      -- Open the next error
-  ["p"] = compile.prev,      -- Open the previous error
-  ["o"] = compile.this,      -- Open the error under the cursor
-  ["r"] = compile.restart,   -- Restart the compilation process
-  ["q"] = compile.interrupt, -- Kill the compilation process
+    ["n"] = compile.next,      -- Open the next error
+    ["p"] = compile.prev,      -- Open the previous error
+    ["o"] = compile.this,      -- Open the error under the cursor
+    ["r"] = compile.restart,   -- Restart the compilation process
+    ["q"] = compile.interrupt, -- Kill the compilation process
 }
 -------------------------
 -- ----- KEYMAPS ----- --
@@ -236,6 +234,9 @@ map("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
 map("n", "<leader>ee", ":Neotree toggle<CR>", { silent = true })
 
 map("n", "<leader>mf", ":ObsidianFollowLink<CR>", { silent = true })
+
+map('i', '<Tab>',   [[pumvisible() ? "\<C-n>" : "\<Tab>"]],   { expr = true })
+map('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
 
 map("n", "<C-S>", ":w<CR>")
 map("n", "<leader>cd", ":cd %:h<CR>")
@@ -256,21 +257,19 @@ map({ "n", "x", "o" }, "L", "$")
 map("i", "<A-;>", "<Esc>miA;<Esc>`ia")
 
 -- Telescope keybinds --
-map("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
-map("n", "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
-map("n", "<leader>/", require("telescope.builtin").current_buffer_fuzzy_find, { desc = "[/] Fuzzily search in buffer]" })
-map("n", "<leader>ff", require("telescope.builtin").find_files, { desc = "[F]ind [F]iles" })
-map("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "[F]ind [H]elp" })
-map("n", "<leader>fw", require("telescope.builtin").grep_string, { desc = "[F]ind current [W]ord" })
-map("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "[F]ind by [G]rep" })
-map("n", "<leader>fj", require("telescope.builtin").jumplist, { desc = "[F]ind in [J]umplist" })
-map("n", "<leader>ft", require("telescope.builtin").jumplist, { desc = "[F]ind in [T]ags" })
-map("n", "<leader>fd", require("telescope.builtin").diagnostics, { desc = "[F]ind [D]iagnostics" })
+local builtin = require("telescope.builtin")
+map("n", "<leader>?",       builtin.oldfiles,                  { desc = "[?] Find recently opened files" })
+map("n", "<leader><space>", builtin.buffers,                   { desc = "[ ] Find existing buffers" })
+map("n", "<leader>/",       builtin.current_buffer_fuzzy_find, { desc = "[/] Fuzzily search in buffer]" })
+map("n", "<leader>ff",      builtin.find_files,                { desc = "[F]ind [F]iles" })
+map("n", "<leader>fh",      builtin.help_tags,                 { desc = "[F]ind [H]elp" })
+map("n", "<leader>fw",      builtin.grep_string,               { desc = "[F]ind current [W]ord" })
+map("n", "<leader>fg",      builtin.live_grep,                 { desc = "[F]ind by [G]rep" })
+map("n", "<leader>fj",      builtin.jumplist,                  { desc = "[F]ind in [J]umplist" })
+map("n", "<leader>fd",      builtin.diagnostics,               { desc = "[F]ind [D]iagnostics" })
 
 -- Spectre (search and replace) --
-map('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', {
-    desc = "Toggle Spectre"
-})
+map('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', { desc = "Toggle Spectre" })
 map('n', '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', {
     desc = "Search current word"
 })
@@ -347,6 +346,7 @@ vim.cmd("autocmd FileType lua set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType c,h set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType odin set expandtab ts=4 shiftwidth=4 softtabstop=4")
 vim.cmd("autocmd FileType go set expandtab ts=4 shiftwidth=4 softtabstop=4")
+vim.cmd("autocmd FileType html,css set expandtab ts=2 shiftwidth=2 softtabstop=2")
 vim.cmd("autocmd FileType typ set expandtab ts=2 shiftwidth=2 softtabstop=2 nu linebreak")
 
 if vim.g.nvy then
