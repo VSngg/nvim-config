@@ -321,13 +321,16 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	pattern = "*",
 })
 
--- [[ Autoresize windows ]]
-vim.api.nvim_create_autocmd({ "VimResized" }, {
-    callback = function()
-        vim.cmd "tabdo wincmd ="
-    end,
+-- [[ Open scratch buffer by default ]]
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
+  pattern = "{}",
+  callback = function()
+    if vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+      vim.bo.buftype = "nofile"
+      vim.bo.bufhidden = "wipe"
+    end
+  end,
 })
-
 -- [[ Close with q in readonly buffers ]]
 vim.api.nvim_create_autocmd({ "FileType" }, {
     pattern = { "qf", "help", "man", "lspinfo", "spectre_panel" },
