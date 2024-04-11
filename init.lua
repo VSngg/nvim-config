@@ -1,10 +1,10 @@
+vim.g.mapleader = " "
+vim.g.maplocalleader = '\\'
+
 -- Install lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
+	vim.fn.system({ "git", "clone", "--filter=blob:none",
 		"https://github.com/folke/lazy.nvim.git",
 		"--branch=stable", -- latest stable release
 		lazypath,
@@ -20,19 +20,76 @@ local plugins = {
     { 'kaarmu/typst.vim', ft = 'typst', lazy=false, },
 	"Tetralux/odin.vim",
     "tikhomirov/vim-glsl",
-    "haringsrob/nvim_context_vt",
-    'shoumodip/compile.nvim',
+    { "haringsrob/nvim_context_vt",
+        config = function()
+        require("nvim_context_vt").setup({
+            min_rows = 1,
+        })
+        end,
+    },
+    { 'shoumodip/compile.nvim',
+        config = function()
+            local compile = require("compile")
+            compile.bind {
+                ["n"] = compile.next,      -- Open the next error
+                ["p"] = compile.prev,      -- Open the previous error
+                ["o"] = compile.this,      -- Open the error under the cursor
+                ["r"] = compile.restart,   -- Restart the compilation process
+                ["q"] = compile.interrupt, -- Kill the compilation process
+            }
+        end,
+    },
     "nvim-pack/nvim-spectre",
 
     { 'echasnovski/mini.nvim', version = false,
-        config = function()
-            require('mini.align').setup()
-            require('mini.surround').setup()
-            require('mini.statusline').setup({ set_vim_settings = false, })
-            require('mini.tabline').setup()
-            require('mini.completion').setup({})
-            require('mini.comment').setup()
-        end,
+    config = function()
+        require('mini.align').setup()
+        require('mini.surround').setup()
+        require('mini.statusline').setup({ set_vim_settings = false, })
+        require('mini.tabline').setup()
+        require('mini.completion').setup()
+        require('mini.comment').setup()
+
+        local miniclue = require('mini.clue')
+        miniclue.setup({
+            window = {col = 40},
+            triggers = {
+                -- Leader triggers
+                { mode = 'n', keys = '<Leader>' },
+                { mode = 'x', keys = '<Leader>' },
+                -- `g` key
+                { mode = 'n', keys = 'g' },
+                { mode = 'x', keys = 'g' },
+
+                -- Marks
+                { mode = 'n', keys = "'" },
+                { mode = 'n', keys = '`' },
+                { mode = 'x', keys = "'" },
+                { mode = 'x', keys = '`' },
+
+                -- Registers
+                { mode = 'n', keys = '"' },
+                { mode = 'x', keys = '"' },
+                { mode = 'i', keys = '<C-r>' },
+                { mode = 'c', keys = '<C-r>' },
+
+                -- Window commands
+                { mode = 'n', keys = '<C-w>' },
+
+                -- `z` key
+                { mode = 'n', keys = 'z' },
+                { mode = 'x', keys = 'z' },
+            },
+
+            clues = {
+                miniclue.gen_clues.g(),
+                miniclue.gen_clues.marks(),
+                miniclue.gen_clues.registers(),
+                miniclue.gen_clues.windows(),
+                miniclue.gen_clues.z(),
+            },
+        })
+    end,
     },
     -- Add indentation guides even on blank lines
     { "lukas-reineke/indent-blankline.nvim",
@@ -46,28 +103,6 @@ local plugins = {
     },
 	-- Fuzzy Finder (files, lsp, etc)
 	{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } , },
-	{
-		"folke/which-key.nvim",
-        enabled = true,
-        dependencies = { 'Wansmer/langmapper.nvim' },
-		config = function()
-            vim.o.timeout = true
-            vim.o.timeoutlen = 300
-
-            local lmu = require('langmapper.utils')
-            local view = require('which-key.view')
-            local execute = view.execute
-
-            -- wrap `execute()` and translate sequence back
-            view.execute = function(prefix_i, mode, buf)
-                -- Translate back to English characters
-                prefix_i = lmu.translate_keycode(prefix_i, 'default', 'ru')
-                execute(prefix_i, mode, buf)
-            end
-
-			require("which-key").setup({})
-		end,
-	},
     { "nvim-neo-tree/neo-tree.nvim",
         branch = "v3.x",
         dependencies = {
@@ -87,16 +122,13 @@ local plugins = {
             })
         end,
     },
-    {
-        'Wansmer/langmapper.nvim',
-        lazy = false,
+    {'Wansmer/langmapper.nvim', lazy = false,
         priority = 1, -- High priority is needed if you will use `autoremap()`
         config = function()
             require('langmapper').setup({--[[ your config ]]})
         end,
     },
-	{
-		"epwalsh/obsidian.nvim",
+	{"epwalsh/obsidian.nvim",
 		version = "*",  -- recommended, use latest release instead of latest commit
 		lazy = true,
 		ft = "markdown",
@@ -105,18 +137,37 @@ local plugins = {
             workspaces = {
                 {
                     name = "personal",
-                    path = "~/vaults/personal",
-                },
-                {
-                    name = "work",
-                    path = "~/vaults/work",
+                    path = "~/Vault",
                 },
             },
         },
-	}
+	},
+    -- {'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
+    {'neovim/nvim-lspconfig'},
 }
 
 require("lazy").setup(plugins)
+
+vim.api.nvim_create_autocmd('LspAttach', {
+    desc = 'LSP actions',
+    callback = function(event)
+        local opts = {buffer = event.buf}
+        local map = vim.keymap.set
+
+        vim.diagnostic.disable()
+        map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts, {desc = "LSP: Hover info"})
+        map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts, {desc = "LSP: Goto definition"})
+        map('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts, {desc = "LSP: Goto declaration"})
+        map('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts, {desc = "LSP: Goto implementation"})
+        map('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts, {desc = "LSP: Goto typedef"})
+        map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts, {desc = "LSP: References"})
+        map('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts, {desc = "LSP: Signature help"})
+        map('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts, {desc = "LSP: Help"})
+        map({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts, {desc = "LSP: Format buffer"})
+    end
+})
+
+require('lspconfig').ols.setup({})
 
 -------------------------
 -- ----- OPTIONS ----- --
@@ -208,20 +259,6 @@ set.inccommand = "split"
 -- ----- REQUIRE ----- --
 -------------------------
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = '\\'
-
-require("nvim_context_vt").setup({
-    min_rows = 1,
-})
-local compile = require("compile")
-compile.bind {
-    ["n"] = compile.next,      -- Open the next error
-    ["p"] = compile.prev,      -- Open the previous error
-    ["o"] = compile.this,      -- Open the error under the cursor
-    ["r"] = compile.restart,   -- Restart the compilation process
-    ["q"] = compile.interrupt, -- Kill the compilation process
-}
 -------------------------
 -- ----- KEYMAPS ----- --
 -------------------------
@@ -229,9 +266,9 @@ local map = vim.keymap.set
 
 map({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
-map("n", "<leader>l", ":nohl<CR>", { silent = true })
-map("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true })
-map("n", "<leader>ee", ":Neotree toggle<CR>", { silent = true })
+map("n", "<leader>l", ":nohl<CR>", { silent = true, desc = "Clear search highlight" })
+map("n", "<leader>ec", ":e $MYVIMRC<CR>", { silent = true, desc = "Edit init.lua" })
+map("n", "<leader>ee", ":Neotree toggle<CR>", { silent = true , desc = "Toggle Neotree"})
 
 map("n", "<leader>mf", ":ObsidianFollowLink<CR>", { silent = true })
 
@@ -239,8 +276,8 @@ map('i', '<Tab>',   [[pumvisible() ? "\<C-n>" : "\<Tab>"]],   { expr = true })
 map('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
 
 map("n", "<C-S>", ":w<CR>")
-map("n", "<leader>cd", ":cd %:h<CR>")
-map("n", "<leader>cc", ":Compile<CR>")
+map("n", "<leader>cd", ":cd %:h<CR>", { desc = "Change dir to current file"} )
+map("n", "<leader>cc", ":Compile<CR>", { desc = "Compile Mode" })
 
 map("n", "<leader>i", "<C-I>", { silent = true, desc = "Jump forward" })
 map("n", "<leader>o", "<C-O>", { silent = true, desc = "Jump back" })
@@ -258,8 +295,8 @@ map("i", "<A-;>", "<Esc>miA;<Esc>`ia")
 
 -- Telescope keybinds --
 local builtin = require("telescope.builtin")
-map("n", "<leader>?",       builtin.oldfiles,                  { desc = "[?] Find recently opened files" })
-map("n", "<leader><space>", builtin.buffers,                   { desc = "[ ] Find existing buffers" })
+map("n", "<leader>?",       builtin.oldfiles,                  { desc = "[?] Recent files" })
+map("n", "<leader><space>", builtin.buffers,                   { desc = "[ ] Open buffers" })
 map("n", "<leader>/",       builtin.current_buffer_fuzzy_find, { desc = "[/] Fuzzily search in buffer]" })
 map("n", "<leader>ff",      builtin.find_files,                { desc = "[F]ind [F]iles" })
 map("n", "<leader>fh",      builtin.help_tags,                 { desc = "[F]ind [H]elp" })
@@ -295,8 +332,6 @@ map("n", "<C-j>", "<C-w>j")
 -- Increment/Decrement --
 map("n", "<leader>a", "<C-a>", { desc = "Increment" })
 map("n", "<leader>x", "<C-x>", { desc = "Decrement" })
-map("n", "<up>", "<C-a>", { desc = "Increment" })
-map("n", "<down>", "<C-x>", { desc = "Decrement" })
 
 -- insert en_US symbols from russian keyboard --
 map("n", "<leader>2", "i@<esc>", { desc = "Insert @" })
@@ -353,14 +388,14 @@ vim.cmd("autocmd FileType html,css set expandtab ts=2 shiftwidth=2 softtabstop=2
 vim.cmd("autocmd FileType typ set expandtab ts=2 shiftwidth=2 softtabstop=2 nu linebreak")
 
 if vim.g.nvy then
-    vim.o.guifont = "Iosevka:h13"
+    vim.o.guifont = "Iosevka Nerd Font:h13"
     map({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
 end
 
 if vim.g.neovide then
-    vim.o.guifont = "Iosevka Nerd Font:h16"
+    vim.o.guifont = "Iosevka Nerd Font:h13"
     vim.keymap.set({"n", "i", "v"}, "<C-S-v>", "<C-R>+")
     vim.g.neovide_scroll_animation_length = 0.2
     vim.g.neovide_cursor_trail_size = 0.2
 end
-require('langmapper').automapping({ global = true, buffer = true })
+-- require('langmapper').automapping({ global = true, buffer = true })
